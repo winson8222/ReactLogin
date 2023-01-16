@@ -1,6 +1,7 @@
 import { Button } from '@mui/material'
 import { useContext } from 'react';
 import { UserContext } from '../contexts/user.context';
+import ShoppingList from '../components/ShoppingList.js';
  
 export default function Home() {
  const { logOutUser } = useContext(UserContext);
@@ -24,6 +25,7 @@ export default function Home() {
    <>
      <h1>Welcome to Expengo</h1>
      <Button variant="contained" onClick={logOut}>Logout</Button>
+     <ShoppingList/>
    </>
  )
 }

@@ -1,6 +1,7 @@
 import { createContext, useState } from "react";
 import { App, Credentials } from "realm-web";
 import { APP_ID } from "../realm/constants";
+import mongoose from "mongoose";
  
 // Creating a Realm App Instance
 const app = new App(APP_ID);
@@ -16,6 +17,26 @@ export const UserProvider = ({ children }) => {
  const emailPasswordLogin = async (email, password) => {
    const credentials = Credentials.emailPassword(email, password);
    const authenticatedUser = await app.logIn(credentials);
+   const mongo = await app.currentUser.mongoClient("mongodb-atlas");
+   const collection = mongo.db("UserList").collection("Users");
+
+   //check if the user exists
+   const id = authenticatedUser.id;
+   console.log(id);
+   const found = await collection.findOne({_id: mongoose.Types.ObjectId(id)});
+   const username = email.substring(0, email.indexOf("@"));
+   console.log(found);
+   if(found === null){
+      const result = await collection.insertOne({
+        "_id": mongoose.Types.ObjectId(authenticatedUser.id),
+        "username": username,
+        "items": [
+          {}
+        ] 
+      })
+      console.log("inserted");
+   } 
+
    setUser(authenticatedUser);
    return authenticatedUser;
  };
@@ -24,6 +45,7 @@ export const UserProvider = ({ children }) => {
  const emailPasswordSignup = async (email, password) => {
    try {
      await app.emailPasswordAuth.registerUser(email, password);
+
      // Since we are automatically confirming our users, we are going to log in
      // the user using the same credentials once the signup is complete.
      return emailPasswordLogin(email, password);

@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { UserContext } from "../contexts/user.context";
- 
+
 const PrivateRoute = () => {
  
  // Fetching the user from the user context.
