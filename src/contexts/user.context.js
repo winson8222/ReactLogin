@@ -22,7 +22,6 @@ export const UserProvider = ({ children }) => {
 
    //check if the user exists
    const id = authenticatedUser.id;
-   console.log(id);
    const found = await collection.findOne({_id: mongoose.Types.ObjectId(id)});
    const username = email.substring(0, email.indexOf("@"));
    console.log(found);
@@ -41,6 +40,7 @@ export const UserProvider = ({ children }) => {
    return authenticatedUser;
  };
  
+
  // Function to sign up user into our App Service app using their email & password
  const emailPasswordSignup = async (email, password) => {
    try {
@@ -67,6 +67,17 @@ export const UserProvider = ({ children }) => {
      throw error;
    }
  }
+
+ //Function to get User data online
+ const fetchData = async () => {
+    // await app.currentUser.refreshCustomData();
+    const mongo = app.currentUser.mongoClient("mongodb-atlas");
+    const collection = mongo.db("UserList").collection("Users");
+    const id = app.currentUser.id;
+    const found = await collection.findOne({_id: mongoose.Types.ObjectId(id)});
+    return found.items;
+
+ }
  
  // Function to logout user from our App Services app
  const logOutUser = async () => {
@@ -81,7 +92,31 @@ export const UserProvider = ({ children }) => {
    }
  }
  
- return <UserContext.Provider value={{ user, setUser, fetchUser, emailPasswordLogin, emailPasswordSignup, logOutUser }}>
+ const changeContent = async (eventType, payLoad) => {
+
+    const mongo = app.currentUser.mongoClient("mongodb-atlas");
+    const collection = mongo.db("UserList").collection("Users");
+    const id = app.currentUser.id;
+    switch(eventType) {
+      case "ADD":
+        var newItem = payLoad;
+        console.log(newItem);
+        await collection.updateOne({_id: mongoose.Types.ObjectId(id)}, {$push: {items: newItem}});
+        var found = await collection.findOne({_id: mongoose.Types.ObjectId(id)})
+        console.log(found);
+        return found.items;
+      case "DELETE":
+        var removed = payLoad;
+        console.log(removed);
+        await collection.updateOne({_id: mongoose.Types.ObjectId(id)}, {$pull: {items: {_id: removed}}});
+        var found = await collection.findOne({_id: mongoose.Types.ObjectId(id)})
+        console.log(found);
+        return found.items;
+      default:
+        return;
+    }
+}
+ return <UserContext.Provider value={{ user, setUser, fetchUser, emailPasswordLogin, emailPasswordSignup, logOutUser, fetchData, changeContent }}>
    {children}
  </UserContext.Provider>;
 }

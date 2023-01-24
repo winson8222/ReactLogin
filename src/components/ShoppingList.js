@@ -1,20 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MaterialTable from "@material-table/core"
+import { useContext } from 'react';
+import { UserContext } from '../contexts/user.context';
+import Item from "./Item"
 
 function ShoppingList(props){
+    const { changeContent } = useContext(UserContext);
+    const [name, setName] = useState("");
+    const [url, setURL] = useState("");
+
+    async function handleAdd(){
+        const itemAdded = {
+            _id: Date.now(),
+            name: name,
+            url: url
+        }
+
+        var newTable = await changeContent("ADD", itemAdded);
+        setTableData(newTable);
+        
+    }
+
+    async function handleRemove(id){
+        var newTable = await changeContent("DELETE", id);
+        setTableData(newTable);
+    }
+
 
     const testlist = [
-        {item: "tester1", url:"randomlink"},
+        {name: "tester1", url:"randomlink"},
+    ]
+
+    const testlist2 = [
+        {name: "2121212", url:"randomlink"},
     ]
     const [tabledata, setTableData] = useState(testlist);
     //examples:
-    const list = [
-        {title: "Item", field:"item"},
-        {title: "URL", field:"url"}
-    ]
+
+    //can use context fetch data instead
+    useEffect(() =>{
+        async function settingData() {
+            const Items = await props.getItems();
+            setTableData(Items);
+            
+        }
+        
+        settingData();
+    }, []);
+
+
+    
     return(
         <div className="itemlist">
-            <MaterialTable columns={list} data={tabledata}/>
+            {tabledata.map((data) =>
+            <Item key={data._id} item={data} handler={handleRemove}/>)}
+            <input value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Item Name"/>
+            <input value={url} onChange={(e) => setURL(e.target.value)} type="text" placeholder="URL" />
+            <button onClick={handleAdd}>Add</button>
         </div>
     )
 }

@@ -4,7 +4,7 @@ import { UserContext } from '../contexts/user.context';
 import ShoppingList from '../components/ShoppingList.js';
  
 export default function Home() {
- const { logOutUser } = useContext(UserContext);
+ const { logOutUser, fetchData } = useContext(UserContext);
  
  // This function is called when the user clicks the "Logout" button.
  const logOut = async () => {
@@ -20,12 +20,13 @@ export default function Home() {
      alert(error)
    }
  }
+
  
  return (
    <>
      <h1>Welcome to Expengo</h1>
      <Button variant="contained" onClick={logOut}>Logout</Button>
-     <ShoppingList/>
+     <ShoppingList getItems={fetchData}/>
    </>
  )
 }
