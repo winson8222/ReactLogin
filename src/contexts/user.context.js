@@ -26,7 +26,7 @@ export const UserProvider = ({ children }) => {
    const username = email.substring(0, email.indexOf("@"));
    console.log(found);
    if(found === null){
-      const result = await collection.insertOne({
+      await collection.insertOne({
         "_id": mongoose.Types.ObjectId(authenticatedUser.id),
         "username": username,
         "items": [

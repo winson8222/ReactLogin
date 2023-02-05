@@ -1,15 +1,22 @@
 import React, { useContext, useState } from 'react';
 import { UserContext } from '../contexts/user.context';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+
 
 function Item(props) {
     var id = props.item._id;
     return (
-        <div style={{width: "50%"}}>
-            <div>
-                <h3>Item: {props.item.name}</h3>
-                <h2><small>URL:{props.item.url}</small></h2>
-            </div>
-            <button onClick={()=> {props.handler(id)}}>Remove</button>
+        <div>
+            <Card style={{ width: '18rem' }}>
+                <Card.Body>
+                    <Card.Title>{props.item.name}</Card.Title>
+                    <Card.Text>
+                    {props.item.url}
+                    </Card.Text>
+                    <Button onClick={()=> {props.handler(id)}}>Remove</Button>
+                </Card.Body>
+            </Card>
         </div>
     );
 }
